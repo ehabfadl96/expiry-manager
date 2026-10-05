@@ -1,0 +1,13 @@
+<!-- داخل <head> -->
+<link rel="manifest" href="manifest.webmanifest">
+
+<!-- قبل إغلاق </body> -->
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js').catch((err) => {
+      console.warn('Service Worker registration failed:', err);
+    });
+  });
+}
+</script>
