@@ -15,6 +15,13 @@
 </style>
 </head>
 <body>
+<div id="diagBox" role="alert" style="display:none;position:relative;z-index:2147483647;background:#b00020;color:#fff;font:13px/1.4 monospace;padding:10px;white-space:pre-wrap;word-break:break-word;max-height:60vh;overflow:auto;border-bottom:4px solid #000"></div>
+<script>
+/* TEMPORARY DIAGNOSTIC: shows JS errors on screen. Independent of app code. */
+(function(){var n=0;function show(kind,msg,file,line,col,stack){try{var b=document.getElementById('diagBox');if(!b||n>=20)return;n++;if(n===1){var h=document.createElement('div');h.textContent='DIAGNOSTIC - JavaScript error detected (please send a screenshot)';h.style.cssText='font-weight:bold;font-size:15px';b.appendChild(h);}var p=document.createElement('div');p.style.cssText='border-top:1px solid #fff;margin-top:6px;padding-top:6px';var t=['['+n+'] '+kind,'message: '+msg];if(file)t.push('file: '+file);if(line||col)t.push('line:col: '+(line||'?')+':'+(col||'?'));if(stack)t.push('stack: '+String(stack).slice(0,2000));p.textContent=t.join('\n');b.appendChild(p);b.style.display='block';}catch(e){}}
+window.addEventListener('error',function(e){var er=e&&e.error;show('window.error'+(er&&er.name?' ('+er.name+')':''),e&&e.message,e&&e.filename,e&&e.lineno,e&&e.colno,er&&er.stack);});
+window.addEventListener('unhandledrejection',function(e){var r=e&&e.reason;show('unhandledrejection'+(r&&r.name?' ('+r.name+')':''),(r&&r.message)?r.message:String(r),'','','',r&&r.stack);});})();
+</script>
 <div class="app">
 <header class="top">
  <div class="brand"><div class="logo">⌁</div><div><h1>Expiry Manager</h1><p>Offline branch inventory · Phase 1</p></div></div>
