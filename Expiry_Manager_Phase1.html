@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#151515">
+<title>Expiry Manager — Phase 1</title>
+<style>
+:root{--yellow:#f6c500;--yellow-dark:#dba800;--black:#151515;--white:#fff;--bg:#f6f6f3;--ink:#171717;--muted:#60605b;--line:#deded7;--red:#b53434;--amber:#a15c00;--blue:#1f497d;--soft-yellow:#fff7d7}
+*{box-sizing:border-box}html,body{max-width:100%;overflow-x:hidden}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.45 system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}button,input,select{font:inherit}button{cursor:pointer}.app{max-width:1120px;margin:auto;padding:14px 12px 28px}.top{display:flex;flex-direction:column;gap:14px;margin-bottom:16px}.brand{display:flex;gap:10px;align-items:center}.logo{width:42px;height:42px;border-radius:12px;background:var(--yellow);color:var(--black);display:grid;place-items:center;font-size:22px;font-weight:900}.brand h1{font-size:21px;letter-spacing:-.02em;margin:0;color:var(--black)}.brand p{margin:1px 0 0;color:var(--muted);font-size:12px}.actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;width:100%}.btn{min-height:46px;border:1px solid var(--black);background:var(--white);color:var(--black);border-radius:10px;padding:10px 12px;font-weight:750;line-height:1.2;text-align:center}.btn.primary{background:var(--yellow);border-color:var(--yellow-dark);color:var(--black)}.btn.soft{background:var(--soft-yellow);border-color:#edd56d;color:var(--black)}.btn.danger{color:var(--red)}.btn:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #f6c50099;outline-offset:2px}.btn:disabled{opacity:.48;cursor:not-allowed}.stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:14px}.stat,.panel{background:var(--white);border:1px solid var(--line);border-radius:14px}.stat{padding:12px;border-top:4px solid var(--black)}.stat.green{border-top-color:var(--yellow-dark)}.stat.red{border-top-color:var(--red)}.stat.amber{border-top-color:var(--amber)}.stat span{display:block;color:var(--muted);font-size:12px;font-weight:650}.stat strong{display:block;font-size:25px;line-height:1.15;margin-top:5px;color:var(--black)}.stat.red strong{color:var(--red)}.stat.amber strong{color:var(--amber)}.stat.green strong{color:var(--black)}.layout{display:grid;grid-template-columns:minmax(0,1fr);gap:14px;align-items:start}.panel{padding:14px;min-width:0}.panel h2{font-size:17px;color:var(--black);margin:0 0 14px}.field{margin-bottom:12px}.field label{display:block;font-size:13px;font-weight:750;color:var(--black);margin-bottom:6px}.field input,.field select,.toolbar input,.toolbar select{width:100%;border:1px solid #b9b9b0;border-radius:9px;padding:11px 12px;background:var(--white);color:var(--ink);min-height:46px}.row2{display:grid;grid-template-columns:minmax(0,1fr);gap:0}.form-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:7px}.hint{font-size:12px;color:var(--muted);margin:10px 0 0}.toolbar{display:grid;grid-template-columns:minmax(0,1fr);gap:8px;margin-bottom:12px}.tablewrap{overflow:visible}table,thead,tbody,tr,td{display:block;width:100%;min-width:0}thead{display:none}tbody{display:grid;gap:10px}tbody tr{border:1px solid var(--line);border-radius:12px;padding:8px 11px;background:var(--white);box-shadow:0 1px 2px #00000008}td{display:grid;grid-template-columns:minmax(92px,.85fr) minmax(0,1.35fr);gap:8px;align-items:start;padding:8px 0;border:0;border-bottom:1px solid #eeeeea;font-size:14px}td:last-child{border-bottom:0;display:flex;align-items:center;gap:4px}td:before{font-size:11px;font-weight:800;letter-spacing:.04em;color:var(--muted);text-transform:uppercase}td:nth-child(1):before{content:'Product'}td:nth-child(2):before{content:'Quantity'}td:nth-child(3):before{content:'Expiry'}td:nth-child(4):before{content:'Status'}td:nth-child(5):before{content:'Actions'}td strong{font-size:14px;line-height:1.3}.sub{display:block;color:var(--muted);font-size:12px;margin-top:3px;word-break:break-word}.pill{display:inline-block;padding:5px 8px;border-radius:99px;font-size:11px;font-weight:800;white-space:normal;text-align:center}.pill.expired{background:#fde9e9;color:#a42e2e}.pill.remove{background:#fff0df;color:#8a4a00}.pill.near{background:#fff5c9;color:#705300}.pill.future{background:#f3f3ef;color:#31312d}.pill.unknown{background:#eef0f1;color:#58636a}.mini{border:0;background:transparent;color:var(--blue);font-weight:800;padding:7px 5px;min-height:36px}.empty{text-align:center;color:var(--muted);padding:30px 10px}.note,.catalogStatus{border-radius:10px;background:#f5f5ef;color:#45453f;padding:11px 12px;font-size:12px;margin-top:12px;border-left:4px solid var(--yellow)}.catalogStatus strong{color:var(--black)}.hidden{display:none!important}.toast{position:fixed;bottom:calc(14px + env(safe-area-inset-bottom));left:12px;right:12px;transform:none;background:var(--black);color:var(--white);padding:12px 14px;border-radius:10px;box-shadow:0 5px 20px #0003;z-index:5;font-size:13px;text-align:center}.foot{font-size:12px;color:var(--muted);margin-top:14px}.filelabel{display:flex;align-items:center;justify-content:center}.mobile-add{display:none}.modeSwitch{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:0 0 14px}.modeSwitch button{min-height:46px;border:1px solid var(--black);background:var(--white);color:var(--black);border-radius:10px;padding:10px 12px;font-weight:800;font-size:14px}.modeSwitch button.active{background:var(--black);color:var(--yellow);border-color:var(--black)}.scannerPanel .field input,.scannerPanel .field select{width:100%}.scannerResult{border:1px solid var(--line);border-radius:12px;padding:13px;margin:10px 0 12px;background:#fafaf7;word-break:break-word}.scannerResult.found{background:#fff9de;border-color:#ebd46b}.scannerResult.notfound{background:#fff7e5;border-color:#f0d9a0}.scannerResult .badge{display:inline-block;padding:4px 8px;border-radius:99px;font-size:11px;font-weight:800;white-space:normal;margin:6px 6px 0 0}.scannerResult .badge.ok{background:var(--yellow);color:var(--black)}.scannerResult .badge.warn{background:#ffefc2;color:#705300}.scannerResult .title{font-weight:850;margin:0 0 5px;color:var(--black)}.scannerResult .meta{font-size:13px;color:var(--muted);line-height:1.45}.scannerResult .meta strong{color:var(--black)}.scannerHint{font-size:12px;color:var(--muted);margin:6px 0 0}.cameraActions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}.cameraActions .btn{width:100%}.cameraPreview{border:2px solid var(--black);border-radius:12px;overflow:hidden;background:var(--black);margin:8px 0;aspect-ratio:4/3}.cameraPreview video{display:block;width:100%;height:100%;object-fit:cover}.cameraStatus{font-size:13px;color:var(--muted);margin:8px 0 11px}.siteFooter{padding:4px 12px calc(12px + env(safe-area-inset-bottom));text-align:center;color:var(--muted);font-size:12px}
+@media(max-width:370px){.actions,.cameraActions{grid-template-columns:minmax(0,1fr)}.brand h1{font-size:19px}td{grid-template-columns:minmax(78px,.72fr) minmax(0,1.28fr)}}
+@media(min-width:540px){.app{padding:18px 18px 34px}.row2{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.toolbar{grid-template-columns:minmax(0,1fr) minmax(180px,.42fr)}.actions{grid-template-columns:repeat(4,minmax(0,1fr))}}
+@media(min-width:761px){.app{padding:20px 20px 40px}.top{flex-direction:row;align-items:center;justify-content:space-between;gap:18px;margin-bottom:18px}.actions{display:flex;width:auto;flex-wrap:wrap}.actions .btn{min-height:42px}.stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}.stat{padding:14px}.layout{grid-template-columns:350px minmax(0,1fr)}.panel{padding:16px}.desktop-form{order:1}.records{order:2}.tablewrap{overflow:auto}table{display:table;border-collapse:collapse;width:100%;min-width:650px;font-size:13px}thead{display:table-header-group}tbody{display:table-row-group}tbody tr{display:table-row;border:0;border-radius:0;padding:0;background:transparent;box-shadow:none}th,td{display:table-cell;width:auto;padding:11px 9px;border-bottom:1px solid #eeeeea;vertical-align:middle}th{text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em;background:#fafaf7}td:before{display:none}td:last-child{display:table-cell}.pill{white-space:nowrap}.toast{left:50%;right:auto;transform:translateX(-50%);max-width:90%;min-width:220px}.siteFooter{padding-bottom:18px}}
+.gs1Link{margin:10px 0 12px;padding:12px;border:1px solid #edd56d;background:var(--soft-yellow);border-radius:12px}.gs1Link h3{margin:0 0 6px;font-size:15px;color:var(--black)}.gs1Link .gs1Parsed{font-size:12px;color:var(--muted);margin:0 0 10px;word-break:break-all}.gs1Link input{width:100%;border:1px solid #b9b9b0;border-radius:9px;padding:11px 12px;background:var(--white);min-height:46px}.gs1Results{display:grid;gap:6px;margin-top:8px;max-height:260px;overflow:auto}.gs1Result{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--white);border-radius:10px;padding:9px 11px;color:var(--ink)}.gs1Result.active{background:var(--soft-yellow)}.gs1Link label{display:block;margin:2px 0 6px;font-size:14px}.gs1Link .hint{font-size:12px;color:var(--muted);margin-top:6px}.gs1Result.selected{border-color:var(--black);box-shadow:0 0 0 2px var(--yellow)}.gs1Result strong{display:block;font-size:14px}.gs1Result span{display:block;font-size:12px;color:var(--muted)}.gs1Confirm{margin-top:10px;padding:10px;border:1px solid var(--black);background:var(--white);border-radius:10px;font-size:13px}.gs1Confirm .form-actions{margin-top:10px}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+ <div class="brand"><div class="logo">⌁</div><div><h1>Expiry Manager</h1><p>Offline branch inventory · Phase 1</p></div></div>
+ <div class="actions">
+  <button class="btn" id="exportCsv">Export Excel (CSV)</button>
+  <button class="btn" id="backupBtn">Backup</button>
+  <button class="btn" id="catalogImportBtn">Update catalog</button><input class="hidden" id="catalogFile" type="file" accept=".csv,text/csv">
+  <label class="btn filelabel" for="restoreFile">Restore</label><input class="hidden" id="restoreFile" type="file" accept=".json,application/json">
+ </div>
+</header>
+<section class="stats">
+ <div class="stat green"><span>Total batches</span><strong id="totalStat">0</strong></div>
+ <div class="stat red"><span>Expired</span><strong id="expiredStat">0</strong></div>
+ <div class="stat amber"><span>Remove from shelf</span><strong id="removeStat">0</strong></div>
+ <div class="stat"><span>Near expiry</span><strong id="nearStat">0</strong></div>
+</section>
+<div class="layout">
+ <section class="panel desktop-form">
+  <h2 id="formTitle">Add a batch</h2>
+  <div class="modeSwitch" role="group" aria-label="Entry mode"><button type="button" id="manualMode" class="active" aria-pressed="true">Manual</button><button type="button" id="scannerMode" aria-pressed="false">Scanner</button></div>
+  <section id="scannerPanel" class="scannerPanel hidden" aria-label="Scanner lookup">
+   <div class="field"><label for="scannerInput">Barcode or GS1 code</label><input id="scannerInput" type="text" maxlength="500" placeholder="Type or paste a barcode or GS1 code" autocomplete="off"></div>
+   <button class="btn primary" type="button" id="scannerLookup">Lookup</button>
+   <div class="cameraActions"><button class="btn" type="button" id="startCamera">Start Camera</button><button class="btn" type="button" id="stopCamera" disabled>Stop Camera</button></div>
+   <div id="cameraPreview" class="cameraPreview hidden"><video id="cameraVideo" playsinline muted aria-label="Camera preview"></video></div>
+   <div id="cameraStatus" class="cameraStatus" role="status">Camera off. You can type or paste a code instead.</div>
+   <div id="scannerResult" class="scannerResult hidden" role="status"></div>
+   <div id="gs1Link" class="gs1Link hidden" aria-label="Link GTIN to catalog product"></div>
+   <div class="field"><label for="scannerProduct">Product name *</label><input id="scannerProduct" maxlength="120" placeholder="Enter product name if not found"></div>
+   <div class="field"><label for="scannerBarcode">Barcode (optional)</label><input id="scannerBarcode" maxlength="80" inputmode="numeric" placeholder="Scanned barcode"></div>
+   <div class="row2">
+    <div class="field"><label for="scannerQuantity">Quantity *</label><input id="scannerQuantity" type="number" min="0" step="1" inputmode="numeric" placeholder="0"></div>
+    <div class="field"><label for="scannerBatch">Batch / lot number (optional)</label><input id="scannerBatch" maxlength="80" placeholder="Batch number"></div>
+   </div>
+   <div class="row2">
+    <div class="field"><label for="scannerExpiryMonth">Expiry month *</label><select id="scannerExpiryMonth"><option value="">Month</option><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select></div>
+    <div class="field"><label for="scannerExpiryYear">Expiry year *</label><input id="scannerExpiryYear" type="number" min="2020" max="2100" placeholder="2027" inputmode="numeric"></div>
+   </div>
+   <div class="field"><label for="scannerNotes">Notes (optional)</label><input id="scannerNotes" maxlength="250" placeholder="Optional note"></div>
+   <button class="btn primary" type="button" id="scannerSave">Save batch</button>
+   </section>
+  <form id="batchForm">
+   <input type="hidden" id="editId">
+   <div class="field"><label for="product">Product name *</label><input id="product" required maxlength="120" placeholder="e.g. Bioderma Photoderm SPF 50+"></div>
+   <div class="field"><label for="barcode">Barcode (optional)</label><input id="barcode" maxlength="80" inputmode="numeric" placeholder="Barcode"></div>
+   <div class="field"><label for="batch">Batch / lot number (optional)</label><input id="batch" maxlength="80" placeholder="Batch number"></div>
+   <div class="row2">
+    <div class="field"><label for="quantity">Quantity *</label><input id="quantity" required type="number" min="0" step="1" inputmode="numeric" placeholder="0"></div>
+    <div class="field"><label for="unit">Unit</label><select id="unit"><option>pcs</option><option>boxes</option><option>units</option><option>packs</option></select></div>
+   </div>
+   <div class="row2">
+    <div class="field"><label for="expiryMonth">Expiry month *</label><select id="expiryMonth" required><option value="">Month</option><option value="1">January</option><option value="2">February</option><option value="3">March</option><option value="4">April</option><option value="5">May</option><option value="6">June</option><option value="7">July</option><option value="8">August</option><option value="9">September</option><option value="10">October</option><option value="11">November</option><option value="12">December</option></select></div>
+    <div class="field"><label for="expiryYear">Expiry year *</label><input id="expiryYear" required type="number" min="2020" max="2100" placeholder="2027" inputmode="numeric"></div>
+   </div>
+   <div class="field"><label for="notes">Notes (optional)</label><input id="notes" maxlength="250" placeholder="Optional note"></div>
+   <div class="form-actions"><button class="btn primary" type="submit" id="saveBtn">Save batch</button><button class="btn" type="button" id="cancelEdit" hidden>Cancel</button></div>
+   <p class="hint">Expiry is recorded as month/year. The app applies the branch's 3-month shelf-removal policy.</p>
+  </form>
+  <div class="note"><strong>Privacy:</strong> Data stays in this browser on this device. Use Backup regularly before changing or resetting devices.</div>
+  <div class="catalogStatus" id="catalogStatus" role="status"><strong>Product catalog:</strong> Checking local catalog…</div>
+ </section>
+ <section class="panel records">
+  <h2>Batch inventory</h2>
+  <div class="toolbar">
+   <input id="search" type="search" placeholder="Search product, barcode or batch…">
+   <select id="filter"><option value="all">All statuses</option><option value="expired">Expired</option><option value="remove">Remove from shelf</option><option value="near">Near expiry</option><option value="future">Future expiry</option></select>
+  </div>
+  <div class="tablewrap"><table><thead><tr><th>Product / batch</th><th>Qty</th><th>Expiry</th><th>Status</th><th>Actions</th></tr></thead><tbody id="rows"></tbody></table><div id="empty" class="empty">No batches yet. Add your first batch using the form.</div></div>
+  <p class="foot">Policy: on the first day of a month, the current month and next two months are marked “Remove from shelf.” The following two months are marked “Near expiry.” Review actual company procedures before acting.</p>
+ </section>
+</div>
+</div>
+<footer class="siteFooter">Created by Dr. Ehab Fadl</footer>
+<div id="toast" class="toast hidden" role="status"></div>
+<script src="zxing.min.js"></script>
+<script>
+(() => {
+ const DB_NAME='ExpiryManagerDB', STORE='batches', CATALOG_STORE='productCatalog', ALIAS_STORE='productAliases', CATALOG_META_STORE='catalogMeta', DB_VERSION=2;
+ const CATALOG_FIELDS=['ItemCode','ProductName','AlternateDescription','Department','Division','CategoryGroup','MerchandiseCategory','Barcode','Brand'], CATALOG_META_KEY='catalog', BUILTIN_CATALOG_URL='Expiry_Product_Catalog_Clean_v2.csv';
+ let db, records=[], catalogByItemCode=new Map(), catalogByBarcode=new Map(), catalogByNormalizedBarcode=new Map(), aliasesByCode=new Map();
+ const $=id=>document.getElementById(id);
+ const months=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+ const units=['pcs','boxes','units','packs'];
+ function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,DB_VERSION);req.onupgradeneeded=()=>{const d=req.result;if(!d.objectStoreNames.contains(STORE)){const s=d.createObjectStore(STORE,{keyPath:'id'});s.createIndex('product','product',{unique:false});s.createIndex('expiryKey','expiryKey',{unique:false});}if(!d.objectStoreNames.contains(CATALOG_STORE)){const s=d.createObjectStore(CATALOG_STORE,{keyPath:'ItemCode'});s.createIndex('Barcode','Barcode',{unique:true});}if(!d.objectStoreNames.contains(ALIAS_STORE)){const s=d.createObjectStore(ALIAS_STORE,{keyPath:'aliasCode'});s.createIndex('itemCode','itemCode',{unique:false});}if(!d.objectStoreNames.contains(CATALOG_META_STORE))d.createObjectStore(CATALOG_META_STORE,{keyPath:'key'});};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);req.onblocked=()=>reject(Error('Local database is blocked.'));});}
+ function all(){return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readonly'),req=tx.objectStore(STORE).getAll();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Database read aborted'));});}
+ function put(item){return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).put(item);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Database save aborted'));});}
+ function merge(items,aliases=[]){return new Promise((resolve,reject)=>{const tx=db.transaction([STORE,ALIAS_STORE],'readwrite'),store=tx.objectStore(STORE),aliasStore=tx.objectStore(ALIAS_STORE);try{items.forEach(item=>store.put(item));aliases.forEach(alias=>aliasStore.put(alias));}catch(err){tx.abort();reject(err);return;}tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Restore transaction aborted'));});}
+ function remove(id){return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(id);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Database delete aborted'));});}
+ function getAllFromStore(storeName){return new Promise((resolve,reject)=>{const tx=db.transaction(storeName,'readonly'),req=tx.objectStore(storeName).getAll();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Database read aborted'));});}
+ function getFromStore(storeName,key){return new Promise((resolve,reject)=>{const tx=db.transaction(storeName,'readonly'),req=tx.objectStore(storeName).get(key);req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Database read aborted'));});}
+ function normalizeBarcode(value){return String(value??'').replace(/ |-/g,'');}
+ function parseCatalogCsv(text){
+   const rows=[],row=[];let field='',quoted=false;
+   for(let i=0;i<text.length;i++){const ch=text[i];if(quoted){if(ch==='"'){if(text[i+1]==='"'){field+='"';i++;}else quoted=false;}else field+=ch;continue;}if(ch==='"'){if(field)throw Error('Invalid CSV quoting.');quoted=true;}else if(ch===','){row.push(field);field='';}else if(ch==='\n'||ch==='\r'){if(ch==='\r'&&text[i+1]==='\n')i++;row.push(field);if(row.length>1||row[0]!=='')rows.push(row.splice(0));field='';}else field+=ch;}
+   if(quoted)throw Error('Invalid CSV quoting.');if(field||row.length){row.push(field);rows.push(row);}return rows;
+ }
+ function prepareCatalog(text){
+   const rows=parseCatalogCsv(text);if(!rows.length||rows[0].length!==CATALOG_FIELDS.length||rows[0].some((value,index)=>value.replace(/^\uFEFF/,'')!==CATALOG_FIELDS[index]))throw Error('Unexpected catalog columns.');
+   const itemCodes=new Set(),barcodes=new Set(),normalizedBarcodes=new Set(),catalog=[];
+   for(let index=1;index<rows.length;index++){const row=rows[index];if(row.length!==CATALOG_FIELDS.length)throw Error(`Invalid catalog row ${index+1}.`);const product={};CATALOG_FIELDS.forEach((fieldName,column)=>product[fieldName]=row[column]);if(!product.ItemCode||!product.Barcode)throw Error(`Catalog row ${index+1} is missing an ItemCode or Barcode.`);if(itemCodes.has(product.ItemCode)||barcodes.has(product.Barcode))throw Error(`Duplicate catalog key at row ${index+1}.`);const normalized=normalizeBarcode(product.Barcode);if(normalizedBarcodes.has(normalized))throw Error(`Normalized barcode collision at row ${index+1}.`);itemCodes.add(product.ItemCode);barcodes.add(product.Barcode);normalizedBarcodes.add(normalized);catalog.push(product);}
+   return catalog;
+ }
+ function replaceCatalog(records,meta){return new Promise((resolve,reject)=>{const tx=db.transaction([CATALOG_STORE,CATALOG_META_STORE],'readwrite'),catalog=tx.objectStore(CATALOG_STORE),metadata=tx.objectStore(CATALOG_META_STORE);try{catalog.clear();metadata.clear();records.forEach(record=>catalog.add(record));metadata.add(meta);}catch(err){tx.abort();reject(err);return;}tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Catalog update aborted'));});}
+ async function loadCatalogIndexes(){
+   const [catalog,aliases]=await Promise.all([getAllFromStore(CATALOG_STORE),getAllFromStore(ALIAS_STORE)]);const byItemCode=new Map(),byBarcode=new Map(),byNormalizedBarcode=new Map(),byAlias=new Map();
+   catalog.forEach(product=>{byItemCode.set(product.ItemCode,product);byBarcode.set(product.Barcode,product);byNormalizedBarcode.set(normalizeBarcode(product.Barcode),product);});aliases.forEach(alias=>byAlias.set(alias.aliasCode,alias));catalogByItemCode=byItemCode;catalogByBarcode=byBarcode;catalogByNormalizedBarcode=byNormalizedBarcode;aliasesByCode=byAlias;return catalog.length;
+ }
+ async function addProductAlias(aliasCode,itemCode,source){
+   if(typeof aliasCode!=='string'||!aliasCode||typeof itemCode!=='string'||!catalogByItemCode.has(itemCode))throw Error('Alias code and catalog ItemCode are required.');const old=aliasesByCode.get(aliasCode),now=new Date().toISOString(),alias={aliasCode,itemCode,source:typeof source==='string'?source:'',createdAt:old?.createdAt||now,updatedAt:now};await new Promise((resolve,reject)=>{const tx=db.transaction(ALIAS_STORE,'readwrite');tx.objectStore(ALIAS_STORE).put(alias);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Alias save aborted'));});aliasesByCode.set(aliasCode,alias);return alias;
+ }
+ async function removeProductAlias(aliasCode){await new Promise((resolve,reject)=>{const tx=db.transaction(ALIAS_STORE,'readwrite');tx.objectStore(ALIAS_STORE).delete(aliasCode);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Alias delete aborted'));});aliasesByCode.delete(aliasCode);}
+ function resolvedProduct(product,matchType,matchedValue,confidence){return {found:true,product,matchType,matchedValue,confidence};}
+ function resolveProductCode(input){
+   const value=typeof input==='string'?input:'';if(!value)return {found:false,input:value,matchType:'none'};const exact=catalogByBarcode.get(value);if(exact)return resolvedProduct(exact,'barcode',value,'exact');const normalized=catalogByNormalizedBarcode.get(normalizeBarcode(value));if(normalized)return resolvedProduct(normalized,'normalized-barcode',normalizeBarcode(value),'normalized');const item=catalogByItemCode.get(value);if(item)return resolvedProduct(item,'item-code',value,'exact');const alias=aliasesByCode.get(value);if(alias){const product=catalogByItemCode.get(alias.itemCode);if(product)return resolvedProduct(product,'alias',value,'alias');}if(/^0\d{13}$/.test(value)){const fallback=resolveProductCode(value.slice(1));if(fallback.found)return {...fallback,matchType:'gtin14-leading-zero',matchedValue:value.slice(1),confidence:'exact'};}return {found:false,input:value,matchType:'none'};
+ }
+ function parseGS1Code(input){
+   const raw=typeof input==='string'?input:'';if(!/^01\d{14}/.test(raw))return {isGS1:false,raw};const gtin=raw.slice(2,16),remaining=raw.slice(16);let expiry;
+   if(remaining.startsWith('17')){const expiryRaw=remaining.slice(2,8);if(!/^\d{6}$/.test(expiryRaw))return {isGS1:false,raw};const year=2000+Number(expiryRaw.slice(0,2)),month=Number(expiryRaw.slice(2,4)),day=Number(expiryRaw.slice(4,6)),date=new Date(Date.UTC(year,month-1,day));if(month<1||month>12||day<1||date.getUTCMonth()!==month-1||date.getUTCDate()!==day)return {isGS1:false,raw};expiry={raw:expiryRaw,iso:`${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`};}
+   let batch;{const rest=expiry?remaining.slice(8):remaining;if(rest.startsWith('10')){const body=rest.slice(2),gs=body.indexOf('\x1d');let b;if(gs>=0)b=body.slice(0,gs);else{const next=body.indexOf('21',1);b=next>0?body.slice(0,next):body;}if(/^[\x21-\x7e]{1,20}$/.test(b))batch=b;}}
+   return {isGS1:true,gtin,expiry,batch,raw,remaining};
+ }
+ function resolveScannedCode(input){const direct=resolveProductCode(input);if(direct.found)return {...direct,parsedGS1:false};const parsed=parseGS1Code(input);if(!parsed.isGS1)return direct;const resolved=resolveProductCode(parsed.gtin);return resolved.found?{...resolved,parsedGS1:true,gtin:parsed.gtin,expiry:parsed.expiry,batch:parsed.batch}:{found:false,input:typeof input==='string'?input:'',matchType:'none',parsedGS1:true,gtin:parsed.gtin,expiry:parsed.expiry,batch:parsed.batch};}
+ function monthIndex(y,m){return y*12+(m-1);}
+ function validateAlias(a){
+   if(!a||typeof a!=='object'||Array.isArray(a))throw Error('Invalid product alias structure.');
+   if(typeof a.aliasCode!=='string'||!a.aliasCode.trim()||a.aliasCode.trim().length>64)throw Error('Each product alias needs a valid alias code.');
+   if(typeof a.itemCode!=='string'||!a.itemCode.trim()||a.itemCode.trim().length>64)throw Error('Each product alias needs a valid ItemCode.');
+   for(const k of ['source','createdAt','updatedAt'])if(a[k]!==undefined&&typeof a[k]!=='string')throw Error('Invalid product alias structure.');
+   const now=new Date().toISOString();return {aliasCode:a.aliasCode.trim(),itemCode:a.itemCode.trim(),source:a.source||'',createdAt:a.createdAt||now,updatedAt:a.updatedAt||a.createdAt||now};
+ }
+ function validateRecord(r){
+   if(!r||typeof r!=='object'||Array.isArray(r))throw Error('Invalid record structure.');
+   if(typeof r.id!=='string'||!r.id.trim())throw Error('Each record needs a valid ID.');
+   if(typeof r.product!=='string'||!r.product.trim())throw Error('Each record needs a product name.');
+   if(!Number.isInteger(r.quantity)||r.quantity<0)throw Error('Each record needs a valid non-negative quantity.');
+   if(!units.includes(r.unit))throw Error('Each record needs a valid unit.');
+   if(!Number.isInteger(r.month)||r.month<1||r.month>12)throw Error('Each record needs a valid expiry month.');
+   if(!Number.isInteger(r.year)||r.year<2020||r.year>2100)throw Error('Each record needs a valid expiry year.');
+   if(typeof r.barcode!=='string'||typeof r.batch!=='string'||typeof r.notes!=='string'||typeof r.createdAt!=='string'||typeof r.updatedAt!=='string')throw Error('Invalid record structure.');
+   return {id:r.id,product:r.product.trim(),barcode:r.barcode.trim(),batch:r.batch.trim(),quantity:r.quantity,unit:r.unit,month:r.month,year:r.year,expiryKey:monthIndex(r.year,r.month),notes:r.notes.trim(),createdAt:r.createdAt,updatedAt:r.updatedAt};
+ }
+ function classify(r){
+   const now=new Date(), current=monthIndex(now.getFullYear(),now.getMonth()+1), exp=monthIndex(r.year,r.month), delta=exp-current;
+   if(delta<0)return {key:'expired',label:'Expired'};
+   if(delta<=2)return {key:'remove',label:'Remove from shelf'};
+   if(delta<=4)return {key:'near',label:'Near expiry'};
+   return {key:'future',label:'Future expiry'};
+ }
+ function expiryText(r){return `${String(r.month).padStart(2,'0')}/${r.year}`;}
+ function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+ function catalogStatus(message){$('catalogStatus').textContent=message;}
+ function showCatalogStatus(count,meta){const updatedAt=meta?.lastUpdatedAt||meta?.importedAt;if(!count){catalogStatus('Product catalog: Not loaded.');return;}const date=updatedAt&&!Number.isNaN(Date.parse(updatedAt))?new Date(updatedAt).toLocaleString():'date unavailable';catalogStatus(`Product catalog: ${count.toLocaleString()} products loaded · Last update: ${date}`);}
+ function setCatalogBusy(busy,message){$('catalogImportBtn').disabled=busy;if(message)catalogStatus(message);}
+ function catalogMetadata(recordCount,source){const now=new Date().toISOString();return {key:CATALOG_META_KEY,catalogId:now,importedAt:now,lastUpdatedAt:now,recordCount,source};}
+ async function initializeBuiltInCatalog(){
+   setCatalogBusy(true,'Product catalog: Loading built-in catalog…');
+   try{const response=await fetch(new URL(BUILTIN_CATALOG_URL,window.location.href));if(!response.ok)throw Error('Built-in catalog could not be read.');const catalog=prepareCatalog(await response.text()),meta=catalogMetadata(catalog.length,'built-in');await replaceCatalog(catalog,meta);const count=await loadCatalogIndexes();showCatalogStatus(count,meta);toast(`Built-in product catalog loaded: ${count} records.`);}
+   catch(err){catalogStatus('Product catalog: Could not load the built-in catalog. Scanner lookup is unavailable until a catalog is updated.');console.warn('Built-in catalog unavailable.',err);}
+   finally{setCatalogBusy(false);}
+ }
+ let cameraStream=null,cameraDetector=null,cameraReader=null,cameraTimer=null,cameraActive=false,cameraGeneration=0,cameraLastValue='';
+ const cameraFormats=['ean_13','ean_8','code_128','qr_code','data_matrix','upc_a','upc_e','code_39','codabar','itf'];
+ function setCameraStatus(message){$('cameraStatus').textContent=message;}
+ function setCameraControls(active){$('startCamera').disabled=active;$('stopCamera').disabled=!active;$('cameraPreview').classList.toggle('hidden',!active);}
+ function stopCamera(message='Camera stopped.'){
+   cameraActive=false;cameraGeneration++;if(cameraTimer){clearTimeout(cameraTimer);cameraTimer=null;}if(cameraReader){try{cameraReader.reset();}catch(e){}cameraReader=null;}cameraDetector=null;
+   if(cameraStream){cameraStream.getTracks().forEach(track=>track.stop());cameraStream=null;}const video=$('cameraVideo');video.pause();video.srcObject=null;setCameraControls(false);if(message)setCameraStatus(message);
+ }
+ async function createCameraDetector(){
+   if(!('BarcodeDetector'in window))return null;try{const supported=typeof BarcodeDetector.getSupportedFormats==='function'?await BarcodeDetector.getSupportedFormats():cameraFormats,formats=cameraFormats.filter(format=>supported.includes(format));return new BarcodeDetector(formats.length?{formats}:undefined);}catch(e){return null;}
+ }
+ function handleCameraCode(value){
+   const scanned=typeof value==='string'?value.trim():'';if(!scanned||!cameraActive||scanned===cameraLastValue)return;cameraLastValue=scanned;stopCamera('Code detected. Looking up product…');$('scannerInput').value=scanned;runScannerLookup(scanned);
+ }
+ function scanWithNativeDetector(generation){
+   const scan=async()=>{if(!cameraActive||generation!==cameraGeneration)return;try{const codes=await cameraDetector.detect($('cameraVideo'));if(codes[0]?.rawValue){handleCameraCode(codes[0].rawValue);return;}}catch(e){}if(cameraActive&&generation===cameraGeneration)cameraTimer=setTimeout(scan,180);};scan();
+ }
+ function scanWithZXing(){
+   if(!window.ZXing?.BrowserMultiFormatReader)throw Error('Camera scanner is unsupported.');cameraReader=new ZXing.BrowserMultiFormatReader();const result=cameraReader.decodeFromVideoElementContinuously($('cameraVideo'),(decoded,error)=>{if(decoded)handleCameraCode(decoded.getText());});Promise.resolve(result).catch(()=>{if(cameraActive)stopCamera('Camera scanner could not start.');});
+ }
+ function cameraErrorMessage(error){
+   if(error?.name==='NotAllowedError'||error?.name==='SecurityError')return 'Camera permission denied. You can type or paste a code instead.';
+   if(error?.name==='NotFoundError'||error?.name==='OverconstrainedError')return 'Camera unavailable. No suitable camera was found.';
+   return 'Camera unavailable. You can type or paste a code instead.';
+ }
+ function showCameraDiagnostic(error){
+   const diagnostic={secureContext:window.isSecureContext,mediaDevices:Boolean(navigator.mediaDevices),getUserMedia:typeof navigator.mediaDevices?.getUserMedia==='function',barcodeDetector:'BarcodeDetector'in window,zxingFallback:Boolean(window.ZXing?.BrowserMultiFormatReader),protocol:location.protocol,userAgent:navigator.userAgent,errorName:error?.name||null,errorMessage:error?.message||null};window.ExpiryCameraDiagnostics=diagnostic;console.error('Expiry Manager camera diagnostic',diagnostic);
+   const summary=`Camera diagnostic — secure context: ${diagnostic.secureContext}; mediaDevices: ${diagnostic.mediaDevices}; getUserMedia: ${diagnostic.getUserMedia}; BarcodeDetector: ${diagnostic.barcodeDetector}; ZXing: ${diagnostic.zxingFallback}; protocol: ${diagnostic.protocol}.`;setCameraStatus(error?`${summary} Error: ${diagnostic.errorName||'Unknown'} — ${diagnostic.errorMessage||'No message.'}`:summary);
+ }
+ async function startCamera(){
+   if(cameraActive)return;if(!navigator.mediaDevices?.getUserMedia){showCameraDiagnostic();return;}setCameraStatus('Requesting camera permission…');$('startCamera').disabled=true;cameraLastValue='';
+   try{const stream=await navigator.mediaDevices.getUserMedia({video:{facingMode:{ideal:'environment'}},audio:false});cameraStream=stream;$('cameraVideo').srcObject=stream;await $('cameraVideo').play();cameraActive=true;setCameraControls(true);setCameraStatus('Camera ready. Point camera at a barcode or QR code.');const generation=++cameraGeneration;cameraDetector=await createCameraDetector();if(cameraDetector)scanWithNativeDetector(generation);else scanWithZXing();}
+   catch(error){stopCamera(null);showCameraDiagnostic(error);}
+ }
+ function setEntryMode(mode){const scanner=mode==='scanner';if(!scanner)stopCamera('Camera stopped.');$('scannerPanel').classList.toggle('hidden',!scanner);$('batchForm').classList.toggle('hidden',scanner);$('manualMode').classList.toggle('active',!scanner);$('scannerMode').classList.toggle('active',scanner);$('manualMode').setAttribute('aria-pressed',String(!scanner));$('scannerMode').setAttribute('aria-pressed',String(scanner));if(scanner)$('scannerInput').focus();}
+ function resetScannerFields(){['scannerInput','scannerProduct','scannerBarcode','scannerQuantity','scannerBatch','scannerExpiryMonth','scannerExpiryYear','scannerNotes'].forEach(id=>$(id).value='');$('scannerProduct').readOnly=false;$('scannerResult').classList.add('hidden');hideGs1Link();}
+ function fillScannerProduct(result,input){const product=result.product||{},expiry=result.expiry?.iso||'';$('scannerProduct').value=product.ProductName||'';$('scannerProduct').readOnly=Boolean(product.ProductName);$('scannerBarcode').value=product.Barcode||input;$('scannerBarcode').readOnly=Boolean(product.Barcode);if(/^\d{4}-\d{2}-\d{2}$/.test(expiry)){$('scannerExpiryMonth').value=String(Number(expiry.slice(5,7)));$('scannerExpiryYear').value=expiry.slice(0,4);}if(result.batch)$('scannerBatch').value=result.batch;}
+ function showScannerResult(result){
+   const box=$('scannerResult');box.classList.remove('hidden','found','notfound');if(!result.found){box.classList.add('notfound');box.innerHTML='<p class="title">Product not found</p><div class="meta">No catalog match was found for this code. You can switch to Manual mode to enter the batch.</div><span class="badge warn">Not found</span>';return;}
+   const product=result.product||{},details=[product.ItemCode&&`Item code: <strong>${esc(product.ItemCode)}</strong>`,product.Brand&&`Brand: <strong>${esc(product.Brand)}</strong>`,product.Barcode&&`Barcode: <strong>${esc(product.Barcode)}</strong>`].filter(Boolean).join('<br>');box.classList.add('found');box.innerHTML=`<p class="title">${esc(product.ProductName||'Catalog product')}</p><div class="meta">${details||'Product details are unavailable.'}</div><span class="badge ok">${esc(result.matchType||'match')}</span>`;
+ }
+ function runScannerLookup(input){const value=typeof input==='string'?input.trim():$('scannerInput').value.trim();if(!value){$('scannerResult').classList.remove('hidden','found');$('scannerResult').classList.add('notfound');$('scannerResult').innerHTML='<p class="title">Enter a code first</p><div class="meta">Type or paste a barcode or GS1 code, then select Lookup.</div>';return;}try{const resolver=window.ExpiryProductResolver?.resolveScannedCode;if(typeof resolver!=='function')throw Error('Resolver unavailable');const result=resolver(value);if(result.found)fillScannerProduct(result,value);else{$('scannerProduct').value='';$('scannerProduct').readOnly=false;$('scannerBarcode').value=value;$('scannerBarcode').readOnly=false;}showScannerResult(result);updateGs1Link(result,value);}catch(err){$('scannerResult').classList.remove('hidden','found');$('scannerResult').classList.add('notfound');$('scannerResult').innerHTML='<p class="title">Lookup unavailable</p><div class="meta">The product resolver could not complete this lookup. Try again after the catalog is available.</div>';}}
+ $('manualMode').addEventListener('click',()=>setEntryMode('manual'));
+ $('scannerMode').addEventListener('click',()=>setEntryMode('scanner'));
+ $('scannerLookup').addEventListener('click',()=>runScannerLookup());
+ $('startCamera').addEventListener('click',startCamera);$('stopCamera').addEventListener('click',()=>stopCamera());window.addEventListener('pagehide',()=>stopCamera(null));window.addEventListener('beforeunload',()=>stopCamera(null));
+ $('scannerSave').addEventListener('click',async()=>{const month=Number($('scannerExpiryMonth').value),year=Number($('scannerExpiryYear').value),qty=Number($('scannerQuantity').value);if(!month||!year||!Number.isInteger(qty)||qty<0){toast('Please check the month, year and quantity.');return;}let item;try{item=validateRecord({id:crypto.randomUUID(),product:$('scannerProduct').value,barcode:$('scannerBarcode').value,batch:$('scannerBatch').value,quantity:qty,unit:'pcs',month,year,notes:$('scannerNotes').value,createdAt:new Date().toISOString(),updatedAt:new Date().toISOString()});}catch(err){toast(err.message);return;}try{await put(item);records=await all();render();resetScannerFields();toast('Batch saved.');}catch(err){toast('Could not save data. Please try again.');}});
+ function render(){
+   const q=$('search').value.trim().toLowerCase(),f=$('filter').value;
+   const sorted=[...records].sort((a,b)=>monthIndex(a.year,a.month)-monthIndex(b.year,b.month)||a.product.localeCompare(b.product));
+   const counts={expired:0,remove:0,near:0};
+   records.forEach(r=>{const s=classify(r);if(counts[s.key]!==undefined)counts[s.key]++;});
+   $('totalStat').textContent=records.length;$('expiredStat').textContent=counts.expired;$('removeStat').textContent=counts.remove;$('nearStat').textContent=counts.near;
+   const visible=sorted.filter(r=>{const s=classify(r),hay=[r.product,r.barcode,r.batch,r.notes].join(' ').toLowerCase();return (!q||hay.includes(q))&&(f==='all'||s.key===f);});
+   $('rows').innerHTML=visible.map(r=>{const s=classify(r);return `<tr><td><strong>${esc(r.product)}</strong><span class="sub">${esc(r.batch||'No batch number')}${r.barcode?' · '+esc(r.barcode):''}</span></td><td>${esc(r.quantity)} <span class="sub">${esc(r.unit)}</span></td><td>${expiryText(r)}</td><td><span class="pill ${s.key}">${s.label}</span></td><td><button class="mini" data-edit="${r.id}">Edit</button><button class="mini" data-delete="${r.id}">Delete</button></td></tr>`;}).join('');
+   $('empty').classList.toggle('hidden',visible.length>0);
+ }
+ function toast(msg){$('toast').textContent=msg;$('toast').classList.remove('hidden');setTimeout(()=>$('toast').classList.add('hidden'),2600);}
+ function resetForm(){$('batchForm').reset();$('editId').value='';$('formTitle').textContent='Add a batch';$('saveBtn').textContent='Save batch';$('cancelEdit').hidden=true;}
+ $('batchForm').addEventListener('submit',async e=>{e.preventDefault();const month=Number($('expiryMonth').value),year=Number($('expiryYear').value),qty=Number($('quantity').value);if(!month||!year||!Number.isInteger(qty)||qty<0){toast('Please check the month, year and quantity.');return;}
+ const id=$('editId').value||crypto.randomUUID();const old=records.find(x=>x.id===id);
+ let item;try{item=validateRecord({id,product:$('product').value,barcode:$('barcode').value,batch:$('batch').value,quantity:qty,unit:$('unit').value,month,year,notes:$('notes').value,createdAt:old?.createdAt||new Date().toISOString(),updatedAt:new Date().toISOString()});}catch(err){toast(err.message);return;}
+ try{await put(item);records=await all();render();resetForm();toast('Batch saved.');}catch(err){toast('Could not save data. Please try again.');}});
+ $('cancelEdit').addEventListener('click',resetForm);
+ $('rows').addEventListener('click',async e=>{const edit=e.target.dataset.edit,del=e.target.dataset.delete;if(edit){const r=records.find(x=>x.id===edit);if(!r)return;$('editId').value=r.id;$('product').value=r.product;$('barcode').value=r.barcode;$('batch').value=r.batch;$('quantity').value=r.quantity;$('unit').value=r.unit;$('expiryMonth').value=r.month;$('expiryYear').value=r.year;$('notes').value=r.notes;$('formTitle').textContent='Edit batch';$('saveBtn').textContent='Update batch';$('cancelEdit').hidden=false;window.scrollTo({top:0,behavior:'smooth'});}if(del){const r=records.find(x=>x.id===del);if(r&&confirm(`Delete ${r.product} (${expiryText(r)})?`)){try{await remove(del);records=await all();render();toast('Batch deleted.');}catch(err){toast('Could not delete batch. Please try again.');}}}});
+ $('search').addEventListener('input',render);$('filter').addEventListener('change',render);
+ function csvCell(v){return '"'+String(v??'').replace(/"/g,'""')+'"';}
+ $('exportCsv').addEventListener('click',()=>{if(!records.length){toast('No data to export.');return;}const head=['Product Name','Barcode','Batch Number','Quantity','Unit','Expiry Month','Expiry Year','Expiry Date','Months Remaining','Status','Notes','Created At','Updated At'];const rows=records.map(r=>{const s=classify(r),now=new Date(),delta=monthIndex(r.year,r.month)-monthIndex(now.getFullYear(),now.getMonth()+1);return [r.product,r.barcode,r.batch,r.quantity,r.unit,r.month,r.year,expiryText(r),delta,s.label,r.notes,r.createdAt,r.updatedAt];});const csv='\ufeff'+[head,...rows].map(row=>row.map(csvCell).join(',')).join('\r\n');download(new Blob([csv],{type:'text/csv;charset=utf-8;'}),`expiry-report-${new Date().toISOString().slice(0,10)}.csv`);});
+ $('backupBtn').addEventListener('click',async()=>{let productAliases;try{productAliases=await getAllFromStore(ALIAS_STORE);}catch(err){alert('Backup failed: product links could not be read.');return;}const payload={app:'Expiry Manager',schemaVersion:1,exportedAt:new Date().toISOString(),records,productAliases};download(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),`expiry-backup-${new Date().toISOString().slice(0,10)}.json`);toast('Backup file created.');});
+ $('restoreFile').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{const parsed=JSON.parse(await file.text());if(parsed.app!=='Expiry Manager'||parsed.schemaVersion!==1||!Array.isArray(parsed.records))throw Error('Invalid backup');const imported=parsed.records.map(validateRecord);if(parsed.productAliases!==undefined&&!Array.isArray(parsed.productAliases))throw Error('Invalid backup');const importedAliases=(parsed.productAliases||[]).map(validateAlias);if(!confirm(`Restore ${imported.length} records${importedAliases.length?` and ${importedAliases.length} product links`:''}? This will merge by record ID; matching IDs will be replaced.`))return;await merge(imported,importedAliases);importedAliases.forEach(alias=>aliasesByCode.set(alias.aliasCode,alias));records=await all();render();toast('Backup restored and merged.');}catch(err){alert(`Restore failed: ${err.message||'invalid or incompatible backup file.'}`);}finally{e.target.value='';}});
+ $('catalogImportBtn').addEventListener('click',()=>$('catalogFile').click());
+ $('catalogFile').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;setCatalogBusy(true,'Product catalog: Validating update…');try{const catalog=prepareCatalog(await file.text()),meta=catalogMetadata(catalog.length,'manual-update');await replaceCatalog(catalog,meta);const count=await loadCatalogIndexes();showCatalogStatus(count,meta);toast(`Product catalog updated: ${count} records.`);}catch(err){toast('Could not update product catalog. The previous catalog was kept.');try{const count=await loadCatalogIndexes(),meta=await getFromStore(CATALOG_META_STORE,CATALOG_META_KEY);showCatalogStatus(count,meta);}catch(refreshError){catalogStatus('Product catalog: Status unavailable.');}}finally{setCatalogBusy(false);e.target.value='';}});
+ function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+ async function init(){try{if(!('indexedDB'in window))throw Error('IndexedDB unavailable');db=await openDB();records=await all();render();try{const count=await loadCatalogIndexes(),meta=await getFromStore(CATALOG_META_STORE,CATALOG_META_KEY);if(count)showCatalogStatus(count,meta);else await initializeBuiltInCatalog();}catch(e){catalogStatus('Product catalog: Status unavailable.');console.warn('Product catalog unavailable.',e);}}catch(e){alert('Could not open the local database. Try a current version of Safari or Chrome.');}}
+ /* ---- Manual GS1 GTIN -> catalog ItemCode linking (uses existing productAliases store) ---- */
+ let gs1LinkContext=null,gs1Selected=null,gs1Shown=[],gs1Active=-1,gs1Timer=0,gs1Index=null,gs1IndexSource=null;
+ function hideGs1Link(){clearTimeout(gs1Timer);gs1LinkContext=null;gs1Selected=null;gs1Shown=[];gs1Active=-1;const box=$('gs1Link');if(box){box.classList.add('hidden');box.innerHTML='';}}
+ function gs1SearchIndex(){
+   if(gs1IndexSource!==catalogByItemCode||!gs1Index){gs1Index=[];for(const p of catalogByItemCode.values())gs1Index.push({p,name:String(p.ProductName??'').toLowerCase(),alt:String(p.AlternateDescription??'').toLowerCase(),brand:String(p.Brand??'').toLowerCase(),code:String(p.ItemCode??'').toLowerCase(),bar:String(p.Barcode??'').toLowerCase()});gs1IndexSource=catalogByItemCode;}
+   return gs1Index;
+ }
+ function searchCatalogForLink(query,limit=10){
+   const q=String(query||'').trim().toLowerCase();if(q.length<2)return [];const tokens=q.split(/\s+/).filter(Boolean),multi=tokens.length>1,buckets=[[],[],[],[],[],[],[],[]];
+   for(const e of gs1SearchIndex()){
+     let tier=-1;
+     if(e.code===q)tier=0;else if(e.bar===q)tier=1;else if(e.name.startsWith(q))tier=2;else if(e.name.includes(q))tier=3;else if(multi&&tokens.every(t=>e.name.includes(t)))tier=4;
+     else if(e.alt.includes(q)||(multi&&tokens.every(t=>e.name.includes(t)||e.alt.includes(t))))tier=5;else if(e.brand.includes(q))tier=6;else if(e.code.startsWith(q)||e.bar.startsWith(q)||(q.length>=4&&e.bar.includes(q)))tier=7;
+     if(tier<0)continue;if(buckets[tier].length<limit)buckets[tier].push(e);
+   }
+   const out=[];for(const b of buckets){b.sort((a,c)=>a.name.length-c.name.length||(a.name<c.name?-1:a.name>c.name?1:0));for(const e of b){if(out.length<limit)out.push(e.p);}}return out;
+ }
+ function renderGs1Results(){
+   const q=$('gs1Search').value.trim(),list=$('gs1Results');gs1Selected=null;gs1Active=-1;$('gs1Confirm').innerHTML='';
+   if(q.length<2){gs1Shown=[];list.innerHTML='<div class="hint">Type at least 2 characters of the product name.</div>';return;}
+   gs1Shown=searchCatalogForLink(q);
+   if(!gs1Shown.length){list.innerHTML='<div class="hint">No catalog products match your search.</div>';return;}
+   list.innerHTML=gs1Shown.map((p,i)=>`<button type="button" role="option" class="gs1Result" data-item="${esc(p.ItemCode)}" data-i="${i}"><strong>${esc(p.ProductName)}</strong><span>Item code: ${esc(p.ItemCode)} · Barcode: ${esc(p.Barcode)}${p.Brand?' · '+esc(p.Brand):''}</span></button>`).join('');
+ }
+ function highlightGs1(i){
+   const items=$('gs1Results').querySelectorAll('.gs1Result');if(!items.length)return;gs1Active=(i+items.length)%items.length;items.forEach((b,n)=>b.classList.toggle('active',n===gs1Active));if(items[gs1Active].scrollIntoView)items[gs1Active].scrollIntoView({block:'nearest'});
+ }
+ function selectGs1Product(itemCode){
+   const product=catalogByItemCode.get(itemCode);if(!product||!gs1LinkContext)return;gs1Selected=product;
+   $('gs1Results').querySelectorAll('.gs1Result').forEach(b=>b.classList.toggle('selected',b.dataset.item===itemCode));
+   $('gs1Confirm').innerHTML=`<div>Link GTIN <strong>${esc(gs1LinkContext.gtin)}</strong> to <strong>${esc(product.ProductName)}</strong> (Item code ${esc(product.ItemCode)}, catalog barcode ${esc(product.Barcode)})?</div><div class="form-actions"><button type="button" class="btn primary" id="gs1ConfirmBtn">Confirm link</button><button type="button" class="btn" id="gs1CancelBtn">Cancel</button></div>`;
+ }
+ async function confirmGs1Link(){
+   if(!gs1LinkContext||!gs1Selected)return;const {gtin,input}=gs1LinkContext,product=gs1Selected;
+   try{await addProductAlias(gtin,product.ItemCode,'manual-gs1-link');}catch(err){toast('Could not save the link. Please try again.');return;}
+   toast('GTIN linked to catalog product.');runScannerLookup(input);
+ }
+ function updateGs1Link(result,input){
+   if(!result||result.found||!result.parsedGS1||!result.gtin){hideGs1Link();return;}
+   const box=$('gs1Link');if(!box)return;clearTimeout(gs1Timer);gs1LinkContext={gtin:result.gtin,input};gs1Selected=null;gs1Shown=[];gs1Active=-1;
+   const expiry=result.expiry?.iso||'';
+   if(/^\d{4}-\d{2}-\d{2}$/.test(expiry)){$('scannerExpiryMonth').value=String(Number(expiry.slice(5,7)));$('scannerExpiryYear').value=expiry.slice(0,4);}
+   if(result.batch)$('scannerBatch').value=result.batch;
+   const parsed=[`GTIN: ${result.gtin}`,expiry&&`Expiry: ${expiry}`,result.batch&&`Batch: ${result.batch}`].filter(Boolean).join(' · ');
+   box.innerHTML=`<h3>GTIN not found in catalog</h3><p class="gs1Parsed">${esc(parsed)}</p><label for="gs1Search"><strong>Link this scan to an existing product</strong></label><input id="gs1Search" type="search" maxlength="100" placeholder="Search product name..." autocomplete="off" autocapitalize="off" spellcheck="false" role="combobox" aria-expanded="true" aria-controls="gs1Results"><div class="hint">Type the product name. Item code or barcode also work.</div><div id="gs1Results" class="gs1Results" role="listbox"></div><div id="gs1Confirm"></div>`;
+   box.classList.remove('hidden');
+   const s=$('gs1Search');
+   s.addEventListener('input',()=>{clearTimeout(gs1Timer);gs1Timer=setTimeout(renderGs1Results,90);});
+   s.addEventListener('keydown',e=>{if(e.key==='ArrowDown'){e.preventDefault();clearTimeout(gs1Timer);if(!gs1Shown.length)renderGs1Results();highlightGs1(gs1Active+1);}else if(e.key==='ArrowUp'){e.preventDefault();highlightGs1(gs1Active<0?-1:gs1Active-1);}else if(e.key==='Enter'){e.preventDefault();clearTimeout(gs1Timer);if(!gs1Shown.length)renderGs1Results();const p=gs1Shown[gs1Active>=0?gs1Active:(gs1Shown.length===1?0:-1)];if(p)selectGs1Product(p.ItemCode);}});
+   $('gs1Results').addEventListener('click',e=>{const b=e.target.closest('.gs1Result');if(b)selectGs1Product(b.dataset.item);});
+   $('gs1Confirm').addEventListener('click',e=>{if(e.target.id==='gs1ConfirmBtn')confirmGs1Link();else if(e.target.id==='gs1CancelBtn'){gs1Selected=null;$('gs1Confirm').innerHTML='';$('gs1Results').querySelectorAll('.gs1Result').forEach(b=>b.classList.remove('selected'));}});
+   renderGs1Results();try{s.focus({preventScroll:true});}catch(err){}
+ }
+ window.ExpiryProductResolver={resolveProductCode,resolveScannedCode,parseGS1Code,loadCatalogIndexes,addProductAlias,removeProductAlias};
+ init();
+})();
+</script>
+</body>
+</html>
