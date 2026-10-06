@@ -11,17 +11,9 @@
 @media(max-width:370px){.actions,.cameraActions{grid-template-columns:minmax(0,1fr)}.brand h1{font-size:19px}td{grid-template-columns:minmax(78px,.72fr) minmax(0,1.28fr)}}
 @media(min-width:540px){.app{padding:18px 18px 34px}.row2{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.toolbar{grid-template-columns:minmax(0,1fr) minmax(180px,.42fr)}.actions{grid-template-columns:repeat(4,minmax(0,1fr))}}
 @media(min-width:761px){.app{padding:20px 20px 40px}.top{flex-direction:row;align-items:center;justify-content:space-between;gap:18px;margin-bottom:18px}.actions{display:flex;width:auto;flex-wrap:wrap}.actions .btn{min-height:42px}.stats{grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:16px}.stat{padding:14px}.layout{grid-template-columns:350px minmax(0,1fr)}.panel{padding:16px}.desktop-form{order:1}.records{order:2}.tablewrap{overflow:auto}table{display:table;border-collapse:collapse;width:100%;min-width:650px;font-size:13px}thead{display:table-header-group}tbody{display:table-row-group}tbody tr{display:table-row;border:0;border-radius:0;padding:0;background:transparent;box-shadow:none}th,td{display:table-cell;width:auto;padding:11px 9px;border-bottom:1px solid #eeeeea;vertical-align:middle}th{text-align:left;color:var(--muted);font-size:11px;text-transform:uppercase;letter-spacing:.04em;background:#fafaf7}td:before{display:none}td:last-child{display:table-cell}.pill{white-space:nowrap}.toast{left:50%;right:auto;transform:translateX(-50%);max-width:90%;min-width:220px}.siteFooter{padding-bottom:18px}}
-.gs1Link{margin:10px 0 12px;padding:12px;border:1px solid #edd56d;background:var(--soft-yellow);border-radius:12px}.gs1Link h3{margin:0 0 6px;font-size:15px;color:var(--black)}.gs1Link .gs1Parsed{font-size:12px;color:var(--muted);margin:0 0 10px;word-break:break-all}.gs1Link input{width:100%;border:1px solid #b9b9b0;border-radius:9px;padding:11px 12px;background:var(--white);min-height:46px}.gs1Results{display:grid;gap:6px;margin-top:8px;max-height:260px;overflow:auto}.gs1Result{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--white);border-radius:10px;padding:9px 11px;color:var(--ink)}.gs1Result.active{background:var(--soft-yellow)}.gs1Link label{display:block;margin:2px 0 6px;font-size:14px}.gs1Link .hint{font-size:12px;color:var(--muted);margin-top:6px}.gs1Result.selected{border-color:var(--black);box-shadow:0 0 0 2px var(--yellow)}.gs1Result strong{display:block;font-size:14px}.gs1Result span{display:block;font-size:12px;color:var(--muted)}.gs1Confirm{margin-top:10px;padding:10px;border:1px solid var(--black);background:var(--white);border-radius:10px;font-size:13px}.gs1Confirm .form-actions{margin-top:10px}
 </style>
 </head>
 <body>
-<div id="diagBox" role="alert" style="display:none;position:relative;z-index:2147483647;background:#b00020;color:#fff;font:13px/1.4 monospace;padding:10px;white-space:pre-wrap;word-break:break-word;max-height:60vh;overflow:auto;border-bottom:4px solid #000"></div>
-<script>
-/* TEMPORARY DIAGNOSTIC: shows JS errors on screen. Independent of app code. */
-(function(){var n=0;function show(kind,msg,file,line,col,stack){try{var b=document.getElementById('diagBox');if(!b||n>=20)return;n++;if(n===1){var h=document.createElement('div');h.textContent='DIAGNOSTIC - JavaScript error detected (please send a screenshot)';h.style.cssText='font-weight:bold;font-size:15px';b.appendChild(h);}var p=document.createElement('div');p.style.cssText='border-top:1px solid #fff;margin-top:6px;padding-top:6px';var t=['['+n+'] '+kind,'message: '+msg];if(file)t.push('file: '+file);if(line||col)t.push('line:col: '+(line||'?')+':'+(col||'?'));if(stack)t.push('stack: '+String(stack).slice(0,2000));p.textContent=t.join('\n');b.appendChild(p);b.style.display='block';}catch(e){}}
-window.addEventListener('error',function(e){var er=e&&e.error;show('window.error'+(er&&er.name?' ('+er.name+')':''),e&&e.message,e&&e.filename,e&&e.lineno,e&&e.colno,er&&er.stack);});
-window.addEventListener('unhandledrejection',function(e){var r=e&&e.reason;show('unhandledrejection'+(r&&r.name?' ('+r.name+')':''),(r&&r.message)?r.message:String(r),'','','',r&&r.stack);});})();
-</script>
 <div class="app">
 <header class="top">
  <div class="brand"><div class="logo">⌁</div><div><h1>Expiry Manager</h1><p>Offline branch inventory · Phase 1</p></div></div>
@@ -49,7 +41,6 @@ window.addEventListener('unhandledrejection',function(e){var r=e&&e.reason;show(
    <div id="cameraPreview" class="cameraPreview hidden"><video id="cameraVideo" playsinline muted aria-label="Camera preview"></video></div>
    <div id="cameraStatus" class="cameraStatus" role="status">Camera off. You can type or paste a code instead.</div>
    <div id="scannerResult" class="scannerResult hidden" role="status"></div>
-   <div id="gs1Link" class="gs1Link hidden" aria-label="Link GTIN to catalog product"></div>
    <div class="field"><label for="scannerProduct">Product name *</label><input id="scannerProduct" maxlength="120" placeholder="Enter product name if not found"></div>
    <div class="field"><label for="scannerBarcode">Barcode (optional)</label><input id="scannerBarcode" maxlength="80" inputmode="numeric" placeholder="Scanned barcode"></div>
    <div class="row2">
@@ -108,7 +99,7 @@ window.addEventListener('unhandledrejection',function(e){var r=e&&e.reason;show(
  function openDB(){return new Promise((resolve,reject)=>{const req=indexedDB.open(DB_NAME,DB_VERSION);req.onupgradeneeded=()=>{const d=req.result;if(!d.objectStoreNames.contains(STORE)){const s=d.createObjectStore(STORE,{keyPath:'id'});s.createIndex('product','product',{unique:false});s.createIndex('expiryKey','expiryKey',{unique:false});}if(!d.objectStoreNames.contains(CATALOG_STORE)){const s=d.createObjectStore(CATALOG_STORE,{keyPath:'ItemCode'});s.createIndex('Barcode','Barcode',{unique:true});}if(!d.objectStoreNames.contains(ALIAS_STORE)){const s=d.createObjectStore(ALIAS_STORE,{keyPath:'aliasCode'});s.createIndex('itemCode','itemCode',{unique:false});}if(!d.objectStoreNames.contains(CATALOG_META_STORE))d.createObjectStore(CATALOG_META_STORE,{keyPath:'key'});};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);req.onblocked=()=>reject(Error('Local database is blocked.'));});}
  function all(){return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readonly'),req=tx.objectStore(STORE).getAll();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Database read aborted'));});}
  function put(item){return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).put(item);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Database save aborted'));});}
- function merge(items,aliases=[]){return new Promise((resolve,reject)=>{const tx=db.transaction([STORE,ALIAS_STORE],'readwrite'),store=tx.objectStore(STORE),aliasStore=tx.objectStore(ALIAS_STORE);try{items.forEach(item=>store.put(item));aliases.forEach(alias=>aliasStore.put(alias));}catch(err){tx.abort();reject(err);return;}tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Restore transaction aborted'));});}
+ function merge(items){return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readwrite'),store=tx.objectStore(STORE);try{items.forEach(item=>store.put(item));}catch(err){tx.abort();reject(err);return;}tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Restore transaction aborted'));});}
  function remove(id){return new Promise((resolve,reject)=>{const tx=db.transaction(STORE,'readwrite');tx.objectStore(STORE).delete(id);tx.oncomplete=resolve;tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Database delete aborted'));});}
  function getAllFromStore(storeName){return new Promise((resolve,reject)=>{const tx=db.transaction(storeName,'readonly'),req=tx.objectStore(storeName).getAll();req.onsuccess=()=>resolve(req.result||[]);req.onerror=()=>reject(req.error);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Database read aborted'));});}
  function getFromStore(storeName,key){return new Promise((resolve,reject)=>{const tx=db.transaction(storeName,'readonly'),req=tx.objectStore(storeName).get(key);req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);tx.onerror=()=>reject(tx.error);tx.onabort=()=>reject(tx.error||Error('Database read aborted'));});}
@@ -140,18 +131,10 @@ window.addEventListener('unhandledrejection',function(e){var r=e&&e.reason;show(
  function parseGS1Code(input){
    const raw=typeof input==='string'?input:'';if(!/^01\d{14}/.test(raw))return {isGS1:false,raw};const gtin=raw.slice(2,16),remaining=raw.slice(16);let expiry;
    if(remaining.startsWith('17')){const expiryRaw=remaining.slice(2,8);if(!/^\d{6}$/.test(expiryRaw))return {isGS1:false,raw};const year=2000+Number(expiryRaw.slice(0,2)),month=Number(expiryRaw.slice(2,4)),day=Number(expiryRaw.slice(4,6)),date=new Date(Date.UTC(year,month-1,day));if(month<1||month>12||day<1||date.getUTCMonth()!==month-1||date.getUTCDate()!==day)return {isGS1:false,raw};expiry={raw:expiryRaw,iso:`${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`};}
-   let batch;{const rest=expiry?remaining.slice(8):remaining;if(rest.startsWith('10')){const body=rest.slice(2),gs=body.indexOf('\x1d');let b;if(gs>=0)b=body.slice(0,gs);else{const next=body.indexOf('21',1);b=next>0?body.slice(0,next):body;}if(/^[\x21-\x7e]{1,20}$/.test(b))batch=b;}}
-   return {isGS1:true,gtin,expiry,batch,raw,remaining};
+   return {isGS1:true,gtin,expiry,raw,remaining};
  }
- function resolveScannedCode(input){const direct=resolveProductCode(input);if(direct.found)return {...direct,parsedGS1:false};const parsed=parseGS1Code(input);if(!parsed.isGS1)return direct;const resolved=resolveProductCode(parsed.gtin);return resolved.found?{...resolved,parsedGS1:true,gtin:parsed.gtin,expiry:parsed.expiry,batch:parsed.batch}:{found:false,input:typeof input==='string'?input:'',matchType:'none',parsedGS1:true,gtin:parsed.gtin,expiry:parsed.expiry,batch:parsed.batch};}
+ function resolveScannedCode(input){const direct=resolveProductCode(input);if(direct.found)return {...direct,parsedGS1:false};const parsed=parseGS1Code(input);if(!parsed.isGS1)return direct;const resolved=resolveProductCode(parsed.gtin);return resolved.found?{...resolved,parsedGS1:true,gtin:parsed.gtin,expiry:parsed.expiry}:{found:false,input:typeof input==='string'?input:'',matchType:'none',parsedGS1:true,gtin:parsed.gtin,expiry:parsed.expiry};}
  function monthIndex(y,m){return y*12+(m-1);}
- function validateAlias(a){
-   if(!a||typeof a!=='object'||Array.isArray(a))throw Error('Invalid product alias structure.');
-   if(typeof a.aliasCode!=='string'||!a.aliasCode.trim()||a.aliasCode.trim().length>64)throw Error('Each product alias needs a valid alias code.');
-   if(typeof a.itemCode!=='string'||!a.itemCode.trim()||a.itemCode.trim().length>64)throw Error('Each product alias needs a valid ItemCode.');
-   for(const k of ['source','createdAt','updatedAt'])if(a[k]!==undefined&&typeof a[k]!=='string')throw Error('Invalid product alias structure.');
-   const now=new Date().toISOString();return {aliasCode:a.aliasCode.trim(),itemCode:a.itemCode.trim(),source:a.source||'',createdAt:a.createdAt||now,updatedAt:a.updatedAt||a.createdAt||now};
- }
  function validateRecord(r){
    if(!r||typeof r!=='object'||Array.isArray(r))throw Error('Invalid record structure.');
    if(typeof r.id!=='string'||!r.id.trim())throw Error('Each record needs a valid ID.');
@@ -217,13 +200,13 @@ window.addEventListener('unhandledrejection',function(e){var r=e&&e.reason;show(
    catch(error){stopCamera(null);showCameraDiagnostic(error);}
  }
  function setEntryMode(mode){const scanner=mode==='scanner';if(!scanner)stopCamera('Camera stopped.');$('scannerPanel').classList.toggle('hidden',!scanner);$('batchForm').classList.toggle('hidden',scanner);$('manualMode').classList.toggle('active',!scanner);$('scannerMode').classList.toggle('active',scanner);$('manualMode').setAttribute('aria-pressed',String(!scanner));$('scannerMode').setAttribute('aria-pressed',String(scanner));if(scanner)$('scannerInput').focus();}
- function resetScannerFields(){['scannerInput','scannerProduct','scannerBarcode','scannerQuantity','scannerBatch','scannerExpiryMonth','scannerExpiryYear','scannerNotes'].forEach(id=>$(id).value='');$('scannerProduct').readOnly=false;$('scannerResult').classList.add('hidden');hideGs1Link();}
- function fillScannerProduct(result,input){const product=result.product||{},expiry=result.expiry?.iso||'';$('scannerProduct').value=product.ProductName||'';$('scannerProduct').readOnly=Boolean(product.ProductName);$('scannerBarcode').value=product.Barcode||input;$('scannerBarcode').readOnly=Boolean(product.Barcode);if(/^\d{4}-\d{2}-\d{2}$/.test(expiry)){$('scannerExpiryMonth').value=String(Number(expiry.slice(5,7)));$('scannerExpiryYear').value=expiry.slice(0,4);}if(result.batch)$('scannerBatch').value=result.batch;}
+ function resetScannerFields(){['scannerInput','scannerProduct','scannerBarcode','scannerQuantity','scannerBatch','scannerExpiryMonth','scannerExpiryYear','scannerNotes'].forEach(id=>$(id).value='');$('scannerProduct').readOnly=false;$('scannerResult').classList.add('hidden');}
+ function fillScannerProduct(result,input){const product=result.product||{},expiry=result.expiry?.iso||'';$('scannerProduct').value=product.ProductName||'';$('scannerProduct').readOnly=Boolean(product.ProductName);$('scannerBarcode').value=product.Barcode||input;$('scannerBarcode').readOnly=Boolean(product.Barcode);if(/^\d{4}-\d{2}-\d{2}$/.test(expiry)){$('scannerExpiryMonth').value=String(Number(expiry.slice(5,7)));$('scannerExpiryYear').value=expiry.slice(0,4);}}
  function showScannerResult(result){
    const box=$('scannerResult');box.classList.remove('hidden','found','notfound');if(!result.found){box.classList.add('notfound');box.innerHTML='<p class="title">Product not found</p><div class="meta">No catalog match was found for this code. You can switch to Manual mode to enter the batch.</div><span class="badge warn">Not found</span>';return;}
    const product=result.product||{},details=[product.ItemCode&&`Item code: <strong>${esc(product.ItemCode)}</strong>`,product.Brand&&`Brand: <strong>${esc(product.Brand)}</strong>`,product.Barcode&&`Barcode: <strong>${esc(product.Barcode)}</strong>`].filter(Boolean).join('<br>');box.classList.add('found');box.innerHTML=`<p class="title">${esc(product.ProductName||'Catalog product')}</p><div class="meta">${details||'Product details are unavailable.'}</div><span class="badge ok">${esc(result.matchType||'match')}</span>`;
  }
- function runScannerLookup(input){const value=typeof input==='string'?input.trim():$('scannerInput').value.trim();if(!value){$('scannerResult').classList.remove('hidden','found');$('scannerResult').classList.add('notfound');$('scannerResult').innerHTML='<p class="title">Enter a code first</p><div class="meta">Type or paste a barcode or GS1 code, then select Lookup.</div>';return;}try{const resolver=window.ExpiryProductResolver?.resolveScannedCode;if(typeof resolver!=='function')throw Error('Resolver unavailable');const result=resolver(value);if(result.found)fillScannerProduct(result,value);else{$('scannerProduct').value='';$('scannerProduct').readOnly=false;$('scannerBarcode').value=value;$('scannerBarcode').readOnly=false;}showScannerResult(result);updateGs1Link(result,value);}catch(err){$('scannerResult').classList.remove('hidden','found');$('scannerResult').classList.add('notfound');$('scannerResult').innerHTML='<p class="title">Lookup unavailable</p><div class="meta">The product resolver could not complete this lookup. Try again after the catalog is available.</div>';}}
+ function runScannerLookup(input){const value=typeof input==='string'?input.trim():$('scannerInput').value.trim();if(!value){$('scannerResult').classList.remove('hidden','found');$('scannerResult').classList.add('notfound');$('scannerResult').innerHTML='<p class="title">Enter a code first</p><div class="meta">Type or paste a barcode or GS1 code, then select Lookup.</div>';return;}try{const resolver=window.ExpiryProductResolver?.resolveScannedCode;if(typeof resolver!=='function')throw Error('Resolver unavailable');const result=resolver(value);if(result.found)fillScannerProduct(result,value);else{$('scannerProduct').value='';$('scannerProduct').readOnly=false;$('scannerBarcode').value=value;$('scannerBarcode').readOnly=false;}showScannerResult(result);}catch(err){$('scannerResult').classList.remove('hidden','found');$('scannerResult').classList.add('notfound');$('scannerResult').innerHTML='<p class="title">Lookup unavailable</p><div class="meta">The product resolver could not complete this lookup. Try again after the catalog is available.</div>';}}
  $('manualMode').addEventListener('click',()=>setEntryMode('manual'));
  $('scannerMode').addEventListener('click',()=>setEntryMode('scanner'));
  $('scannerLookup').addEventListener('click',()=>runScannerLookup());
@@ -250,68 +233,16 @@ window.addEventListener('unhandledrejection',function(e){var r=e&&e.reason;show(
  $('search').addEventListener('input',render);$('filter').addEventListener('change',render);
  function csvCell(v){return '"'+String(v??'').replace(/"/g,'""')+'"';}
  $('exportCsv').addEventListener('click',()=>{if(!records.length){toast('No data to export.');return;}const head=['Product Name','Barcode','Batch Number','Quantity','Unit','Expiry Month','Expiry Year','Expiry Date','Months Remaining','Status','Notes','Created At','Updated At'];const rows=records.map(r=>{const s=classify(r),now=new Date(),delta=monthIndex(r.year,r.month)-monthIndex(now.getFullYear(),now.getMonth()+1);return [r.product,r.barcode,r.batch,r.quantity,r.unit,r.month,r.year,expiryText(r),delta,s.label,r.notes,r.createdAt,r.updatedAt];});const csv='\ufeff'+[head,...rows].map(row=>row.map(csvCell).join(',')).join('\r\n');download(new Blob([csv],{type:'text/csv;charset=utf-8;'}),`expiry-report-${new Date().toISOString().slice(0,10)}.csv`);});
- $('backupBtn').addEventListener('click',async()=>{let productAliases;try{productAliases=await getAllFromStore(ALIAS_STORE);}catch(err){alert('Backup failed: product links could not be read.');return;}const payload={app:'Expiry Manager',schemaVersion:1,exportedAt:new Date().toISOString(),records,productAliases};download(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),`expiry-backup-${new Date().toISOString().slice(0,10)}.json`);toast('Backup file created.');});
- $('restoreFile').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{const parsed=JSON.parse(await file.text());if(parsed.app!=='Expiry Manager'||parsed.schemaVersion!==1||!Array.isArray(parsed.records))throw Error('Invalid backup');const imported=parsed.records.map(validateRecord);if(parsed.productAliases!==undefined&&!Array.isArray(parsed.productAliases))throw Error('Invalid backup');const importedAliases=(parsed.productAliases||[]).map(validateAlias);if(!confirm(`Restore ${imported.length} records${importedAliases.length?` and ${importedAliases.length} product links`:''}? This will merge by record ID; matching IDs will be replaced.`))return;await merge(imported,importedAliases);importedAliases.forEach(alias=>aliasesByCode.set(alias.aliasCode,alias));records=await all();render();toast('Backup restored and merged.');}catch(err){alert(`Restore failed: ${err.message||'invalid or incompatible backup file.'}`);}finally{e.target.value='';}});
+ $('backupBtn').addEventListener('click',()=>{const payload={app:'Expiry Manager',schemaVersion:1,exportedAt:new Date().toISOString(),records};download(new Blob([JSON.stringify(payload,null,2)],{type:'application/json'}),`expiry-backup-${new Date().toISOString().slice(0,10)}.json`);toast('Backup file created.');});
+ $('restoreFile').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;try{const parsed=JSON.parse(await file.text());if(parsed.app!=='Expiry Manager'||parsed.schemaVersion!==1||!Array.isArray(parsed.records))throw Error('Invalid backup');const imported=parsed.records.map(validateRecord);if(!confirm(`Restore ${imported.length} records? This will merge by record ID; matching IDs will be replaced.`))return;await merge(imported);records=await all();render();toast('Backup restored and merged.');}catch(err){alert(`Restore failed: ${err.message||'invalid or incompatible backup file.'}`);}finally{e.target.value='';}});
  $('catalogImportBtn').addEventListener('click',()=>$('catalogFile').click());
  $('catalogFile').addEventListener('change',async e=>{const file=e.target.files[0];if(!file)return;setCatalogBusy(true,'Product catalog: Validating update…');try{const catalog=prepareCatalog(await file.text()),meta=catalogMetadata(catalog.length,'manual-update');await replaceCatalog(catalog,meta);const count=await loadCatalogIndexes();showCatalogStatus(count,meta);toast(`Product catalog updated: ${count} records.`);}catch(err){toast('Could not update product catalog. The previous catalog was kept.');try{const count=await loadCatalogIndexes(),meta=await getFromStore(CATALOG_META_STORE,CATALOG_META_KEY);showCatalogStatus(count,meta);}catch(refreshError){catalogStatus('Product catalog: Status unavailable.');}}finally{setCatalogBusy(false);e.target.value='';}});
  function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
  async function init(){try{if(!('indexedDB'in window))throw Error('IndexedDB unavailable');db=await openDB();records=await all();render();try{const count=await loadCatalogIndexes(),meta=await getFromStore(CATALOG_META_STORE,CATALOG_META_KEY);if(count)showCatalogStatus(count,meta);else await initializeBuiltInCatalog();}catch(e){catalogStatus('Product catalog: Status unavailable.');console.warn('Product catalog unavailable.',e);}}catch(e){alert('Could not open the local database. Try a current version of Safari or Chrome.');}}
- /* ---- Manual GS1 GTIN -> catalog ItemCode linking (uses existing productAliases store) ---- */
- let gs1LinkContext=null,gs1Selected=null,gs1Shown=[],gs1Active=-1,gs1Timer=0,gs1Index=null,gs1IndexSource=null;
- function hideGs1Link(){clearTimeout(gs1Timer);gs1LinkContext=null;gs1Selected=null;gs1Shown=[];gs1Active=-1;const box=$('gs1Link');if(box){box.classList.add('hidden');box.innerHTML='';}}
- function gs1SearchIndex(){
-   if(gs1IndexSource!==catalogByItemCode||!gs1Index){gs1Index=[];for(const p of catalogByItemCode.values())gs1Index.push({p,name:String(p.ProductName??'').toLowerCase(),alt:String(p.AlternateDescription??'').toLowerCase(),brand:String(p.Brand??'').toLowerCase(),code:String(p.ItemCode??'').toLowerCase(),bar:String(p.Barcode??'').toLowerCase()});gs1IndexSource=catalogByItemCode;}
-   return gs1Index;
- }
- function searchCatalogForLink(query,limit=10){
-   const q=String(query||'').trim().toLowerCase();if(q.length<2)return [];const tokens=q.split(/\s+/).filter(Boolean),multi=tokens.length>1,buckets=[[],[],[],[],[],[],[],[]];
-   for(const e of gs1SearchIndex()){
-     let tier=-1;
-     if(e.code===q)tier=0;else if(e.bar===q)tier=1;else if(e.name.startsWith(q))tier=2;else if(e.name.includes(q))tier=3;else if(multi&&tokens.every(t=>e.name.includes(t)))tier=4;
-     else if(e.alt.includes(q)||(multi&&tokens.every(t=>e.name.includes(t)||e.alt.includes(t))))tier=5;else if(e.brand.includes(q))tier=6;else if(e.code.startsWith(q)||e.bar.startsWith(q)||(q.length>=4&&e.bar.includes(q)))tier=7;
-     if(tier<0)continue;if(buckets[tier].length<limit)buckets[tier].push(e);
-   }
-   const out=[];for(const b of buckets){b.sort((a,c)=>a.name.length-c.name.length||(a.name<c.name?-1:a.name>c.name?1:0));for(const e of b){if(out.length<limit)out.push(e.p);}}return out;
- }
- function renderGs1Results(){
-   const q=$('gs1Search').value.trim(),list=$('gs1Results');gs1Selected=null;gs1Active=-1;$('gs1Confirm').innerHTML='';
-   if(q.length<2){gs1Shown=[];list.innerHTML='<div class="hint">Type at least 2 characters of the product name.</div>';return;}
-   gs1Shown=searchCatalogForLink(q);
-   if(!gs1Shown.length){list.innerHTML='<div class="hint">No catalog products match your search.</div>';return;}
-   list.innerHTML=gs1Shown.map((p,i)=>`<button type="button" role="option" class="gs1Result" data-item="${esc(p.ItemCode)}" data-i="${i}"><strong>${esc(p.ProductName)}</strong><span>Item code: ${esc(p.ItemCode)} · Barcode: ${esc(p.Barcode)}${p.Brand?' · '+esc(p.Brand):''}</span></button>`).join('');
- }
- function highlightGs1(i){
-   const items=$('gs1Results').querySelectorAll('.gs1Result');if(!items.length)return;gs1Active=(i+items.length)%items.length;items.forEach((b,n)=>b.classList.toggle('active',n===gs1Active));if(items[gs1Active].scrollIntoView)items[gs1Active].scrollIntoView({block:'nearest'});
- }
- function selectGs1Product(itemCode){
-   const product=catalogByItemCode.get(itemCode);if(!product||!gs1LinkContext)return;gs1Selected=product;
-   $('gs1Results').querySelectorAll('.gs1Result').forEach(b=>b.classList.toggle('selected',b.dataset.item===itemCode));
-   $('gs1Confirm').innerHTML=`<div>Link GTIN <strong>${esc(gs1LinkContext.gtin)}</strong> to <strong>${esc(product.ProductName)}</strong> (Item code ${esc(product.ItemCode)}, catalog barcode ${esc(product.Barcode)})?</div><div class="form-actions"><button type="button" class="btn primary" id="gs1ConfirmBtn">Confirm link</button><button type="button" class="btn" id="gs1CancelBtn">Cancel</button></div>`;
- }
- async function confirmGs1Link(){
-   if(!gs1LinkContext||!gs1Selected)return;const {gtin,input}=gs1LinkContext,product=gs1Selected;
-   try{await addProductAlias(gtin,product.ItemCode,'manual-gs1-link');}catch(err){toast('Could not save the link. Please try again.');return;}
-   toast('GTIN linked to catalog product.');runScannerLookup(input);
- }
- function updateGs1Link(result,input){
-   if(!result||result.found||!result.parsedGS1||!result.gtin){hideGs1Link();return;}
-   const box=$('gs1Link');if(!box)return;clearTimeout(gs1Timer);gs1LinkContext={gtin:result.gtin,input};gs1Selected=null;gs1Shown=[];gs1Active=-1;
-   const expiry=result.expiry?.iso||'';
-   if(/^\d{4}-\d{2}-\d{2}$/.test(expiry)){$('scannerExpiryMonth').value=String(Number(expiry.slice(5,7)));$('scannerExpiryYear').value=expiry.slice(0,4);}
-   if(result.batch)$('scannerBatch').value=result.batch;
-   const parsed=[`GTIN: ${result.gtin}`,expiry&&`Expiry: ${expiry}`,result.batch&&`Batch: ${result.batch}`].filter(Boolean).join(' · ');
-   box.innerHTML=`<h3>GTIN not found in catalog</h3><p class="gs1Parsed">${esc(parsed)}</p><label for="gs1Search"><strong>Link this scan to an existing product</strong></label><input id="gs1Search" type="search" maxlength="100" placeholder="Search product name..." autocomplete="off" autocapitalize="off" spellcheck="false" role="combobox" aria-expanded="true" aria-controls="gs1Results"><div class="hint">Type the product name. Item code or barcode also work.</div><div id="gs1Results" class="gs1Results" role="listbox"></div><div id="gs1Confirm"></div>`;
-   box.classList.remove('hidden');
-   const s=$('gs1Search');
-   s.addEventListener('input',()=>{clearTimeout(gs1Timer);gs1Timer=setTimeout(renderGs1Results,90);});
-   s.addEventListener('keydown',e=>{if(e.key==='ArrowDown'){e.preventDefault();clearTimeout(gs1Timer);if(!gs1Shown.length)renderGs1Results();highlightGs1(gs1Active+1);}else if(e.key==='ArrowUp'){e.preventDefault();highlightGs1(gs1Active<0?-1:gs1Active-1);}else if(e.key==='Enter'){e.preventDefault();clearTimeout(gs1Timer);if(!gs1Shown.length)renderGs1Results();const p=gs1Shown[gs1Active>=0?gs1Active:(gs1Shown.length===1?0:-1)];if(p)selectGs1Product(p.ItemCode);}});
-   $('gs1Results').addEventListener('click',e=>{const b=e.target.closest('.gs1Result');if(b)selectGs1Product(b.dataset.item);});
-   $('gs1Confirm').addEventListener('click',e=>{if(e.target.id==='gs1ConfirmBtn')confirmGs1Link();else if(e.target.id==='gs1CancelBtn'){gs1Selected=null;$('gs1Confirm').innerHTML='';$('gs1Results').querySelectorAll('.gs1Result').forEach(b=>b.classList.remove('selected'));}});
-   renderGs1Results();try{s.focus({preventScroll:true});}catch(err){}
- }
  window.ExpiryProductResolver={resolveProductCode,resolveScannedCode,parseGS1Code,loadCatalogIndexes,addProductAlias,removeProductAlias};
  init();
 })();
 </script>
 </body>
 </html>
+
